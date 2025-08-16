@@ -111,3 +111,61 @@ def show_pred(event, url):
   }
     return FlexContainer.from_dict(flex_pred)
 
+def not_pomelo(url):
+    flex = {  "type": "bubble",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "ขออภัยค่ะ🙏🏻",
+            "size": "lg",
+            "gravity": "bottom",
+            "align": "center",
+            "margin": "none"
+          }
+        ],
+        "margin": "none",
+        "spacing": "none",
+        "borderWidth": "none"
+      },
+      "hero": {
+        "type": "image",
+        "url": url,
+        "size": "full",
+        "aspectMode": "cover",
+        "margin": "none",
+        "aspectRatio": "25:15"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "ตรวจไม่พบรูปส้มโอ",
+            "align": "center",
+            "gravity": "bottom",
+            "size": "lg",
+            "color": "#FF0000",
+            "weight": "bold",
+            "style": "normal",
+            "decoration": "none"
+          },
+          {
+            "type": "separator",
+            "margin": "sm",
+            "color": "#BEBEBE"
+          },
+          {
+            "type": "text",
+            "text": "กรุณาส่งรูปส้มโออีกครั้งค่ะ",
+            "align": "center",
+            "gravity": "bottom",
+            "margin": "md"
+          }
+        ]
+      }
+    }
+    return FlexContainer.from_dict(flex)
