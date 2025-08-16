@@ -10,7 +10,7 @@ from linebot.v3.messaging.models import FlexContainer
 import os
 from dotenv import load_dotenv
 import uvicorn
-from Flex import show_pred
+from Flex import show_pred, not_pomelo
 from FruitClass import FruitClassify
 import requests
 import json
@@ -39,7 +39,7 @@ async def callback(request: Request, x_line_signature: str = Header(None)):
 
 #API ชั่วคราวไว้ส่งรูปกลับไปให้ user
 app.mount("/img", StaticFiles(directory="img"), name="img")
-
+app.mount("/thongdee", StaticFiles(directory="thongdee"), name="thongdee")
 
 # @handler.add(MessageEvent, message=TextMessageContent)
 # def handle_message(event: MessageEvent):
@@ -70,7 +70,8 @@ def loading_animation(user_id: str):
 def handle_image_message(event: MessageEvent):
     loading_animation(user_id=event.source.user_id)
     message_id = event.message.id
-    url = f'https://9f241d4a0f40.ngrok-free.app/img/{message_id}.jpg' 
+    url_reply = f'https://96c52cd1ad63.ngrok-free.app/img/{message_id}.jpg'
+    url_thongdee = f'https://96c52cd1ad63.ngrok-free.app/thongdee/ThongDee.png'
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         blob_api = MessagingApiBlob(api_client)
@@ -86,7 +87,7 @@ def handle_image_message(event: MessageEvent):
 
     if fruit == "Pomelo":
         # predict, conf = Classify(event)
-        flex_pred = show_pred(event, url)
+        flex_pred = show_pred(event, url_reply)
 
         # reply_message = TextMessage(text="ได้รูปแล้ว")
         reply_message = FlexMessage(
@@ -101,13 +102,27 @@ def handle_image_message(event: MessageEvent):
         )
     
     else:
-        reply_message = TextMessage(text= "รบกวนส่งรูปส้มโอมาอีกครั้งได้ไหมคะ")
+        flex_not = not_pomelo(url_thongdee)
+
+        reply_message = FlexMessage(
+            alt_text="ขออภัย",
+            contents=flex_not
+        )
         line_bot_api.reply_message(
             ReplyMessageRequest(
-            reply_token=event.reply_token, 
-            messages=[reply_message]
+                reply_token=event.reply_token,
+                messages=[reply_message]
             )
         )
+    
+    # else:
+    #     reply_message = TextMessage(text= "รบกวนส่งรูปส้มโอมาอีกครั้งได้ไหมคะ")
+    #     line_bot_api.reply_message(
+    #         ReplyMessageRequest(
+    #         reply_token=event.reply_token, 
+    #         messages=[reply_message]
+    #         )
+    #     )
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0")
