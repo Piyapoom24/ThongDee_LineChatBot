@@ -70,8 +70,8 @@ def loading_animation(user_id: str):
 def handle_image_message(event: MessageEvent):
     loading_animation(user_id=event.source.user_id)
     message_id = event.message.id
-    url_reply = f'https://96c52cd1ad63.ngrok-free.app/img/{message_id}.jpg'
-    url_thongdee = f'https://96c52cd1ad63.ngrok-free.app/thongdee/ThongDee.png'
+    url_reply = f'https://e69043f6026f.ngrok-free.app/img/{message_id}.jpg'
+    url_thongdee = f'https://e69043f6026f.ngrok-free.app/thongdee/ThongDee.png'
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         blob_api = MessagingApiBlob(api_client)
@@ -87,7 +87,8 @@ def handle_image_message(event: MessageEvent):
 
     if fruit == "Pomelo":
         # predict, conf = Classify(event)
-        flex_pred = show_pred(event, url_reply)
+        flex_pred, predict = show_pred(event, url_reply)
+        print(predict)
 
         # reply_message = TextMessage(text="ได้รูปแล้ว")
         reply_message = FlexMessage(
