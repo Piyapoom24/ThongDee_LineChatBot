@@ -109,10 +109,10 @@ def show_pred(event, url):
       ]
     }
   }
-    return FlexContainer.from_dict(flex_pred)
+    return FlexContainer.from_dict(flex_pred), predict
 
 def not_pomelo(url):
-    flex = {  "type": "bubble",
+    flex = {"type": "bubble",
       "header": {
         "type": "box",
         "layout": "vertical",
