@@ -4,7 +4,7 @@ from Classifier_model import SomOClassifier
 def show_pred(image, time):
     predictor = SomOClassifier(image)
     conf, label = predictor.predict()
-    confidence = f"{float(conf*100):.2f}"
+    confidence = float(conf*100)
 
     is_sweet = label == "Sweet"
     header_bg  = "#F9FFF5" if is_sweet else "#F8F8F8"
@@ -96,7 +96,7 @@ def show_pred(image, time):
               },
               {
                 "type": "text",
-                "text": confidence,
+                "text": f"{confidence:.2f}%",
                 "size": "md",
                 "color": result_color,
                 "weight": "bold",
@@ -114,7 +114,7 @@ def show_pred(image, time):
                 "type": "box",
                 "layout": "vertical",
                 "contents": [],
-                "width": confidence,
+                "width": f"{round(confidence)}%",
                 "height": "8px",
                 "backgroundColor": bar_color,
                 "cornerRadius": "99px"
@@ -132,7 +132,7 @@ def show_pred(image, time):
               {
                 "type": "text",
                 "text": badge_text,
-                "color": bar_color,
+                "color": result_color,
                 "weight": "bold",
                 "size": "lg",
                 "align": "center"

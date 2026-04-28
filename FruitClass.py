@@ -4,10 +4,11 @@ import torchvision
 import torchvision.transforms as transforms
 import torchvision.models as models
 import torch.nn as nn
+import io
 
 class FruitClassify:
     def __init__(self, image):
-        self.image = image
+        self.image = Image.open(io.BytesIO(image)).convert("RGB")
         self.check_point = torch.load('Classify_ob_model.pth', map_location=torch.device('cpu'), weights_only=True)
         self.model = models.mobilenet_v3_large(weights='IMAGENET1K_V2')
         nr_filters = self.model.classifier[0].in_features
@@ -25,9 +26,9 @@ class FruitClassify:
         ])
     
     def predict(self):
-        img = Image.open(self.image)
+        # img = Image.open(self.image)
         self.model.eval()
-        sample = self.transforms(img).unsqueeze(0).to('cpu')
+        sample = self.transforms(self.image).unsqueeze(0).to('cpu')
         with torch.no_grad():
             output = self.model(sample)
             p = torch.sigmoid((output))

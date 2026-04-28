@@ -77,21 +77,19 @@ def handle_message(event: MessageEvent):
 def handle_image_message(event: MessageEvent):
     loading_animation(user_id=event.source.user_id)
     message_id = event.message.id
+    timest = datetime.datetime.fromtimestamp((event.timestamp) / 1000).strftime("%H:%M:%S")
 
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         blob_api = MessagingApiBlob(api_client)
 
-    timestamp = datetime.datetime.formatimestamp((event.timestamp) / 1000).strftime("%H:%M:%S")
-    content = blob_api.get_message_content(message_id)
-    
-    Check = FruitClassify(image = content, time = timestamp)
-    fruit = Check.predict()
+        content = blob_api.get_message_content(message_id)
+        Check = FruitClassify(image = content)
+        fruit = Check.predict()
 
     if fruit == "Pomelo":
         # predict, conf = Classify(event)
-        flex_pred, predict = show_pred(image = content)
-        print(predict)
+        flex_pred, predict = show_pred(image = content, time = timest)
 
         # reply_message = TextMessage(text="ได้รูปแล้ว")
         reply_message = FlexMessage(
