@@ -1,17 +1,17 @@
 from fastapi import FastAPI, Request, HTTPException, Header
-from linebot import LineBotApi
 from linebot.v3 import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
-from linebot.v3.webhooks import MessageEvent, TextMessageContent, ImageMessageContent, LocationMessageContent
-from linebot.v3.messaging import (ApiClient,MessagingApi,Configuration,ReplyMessageRequest,TextMessage,FlexMessage,MessagingApiBlob,
-                                  ImageMessage,RichMenuRequest, RichMenuArea, RichMenuSize,RichMenuBounds, URIAction, MessageAction)
+from linebot.v3.webhooks import MessageEvent, TextMessageContent, ImageMessageContent, PostbackEvent
+from linebot.v3.messaging import \
+    (ApiClient,MessagingApi,Configuration,ReplyMessageRequest,TextMessage,FlexMessage,MessagingApiBlob,
+    QuickReply,QuickReplyItem,CameraAction,CameraRollAction,ReplyMessageRequest)
 from fastapi.staticfiles import StaticFiles
-from linebot.v3.messaging.models import FlexContainer
-import os
 from dotenv import load_dotenv
-import uvicorn
-from Flex import show_pred, not_pomelo
+from Flex import show_pred, not_pomelo, how_to_use
 from FruitClass import FruitClassify
+
+import os
+import uvicorn
 import requests
 import json
 
@@ -39,21 +39,7 @@ async def callback(request: Request, x_line_signature: str = Header(None)):
 
 #API ชั่วคราวไว้ส่งรูปกลับไปให้ user
 app.mount("/img", StaticFiles(directory="img"), name="img")
-app.mount("/thongdee", StaticFiles(directory="thongdee"), name="thongdee")
 
-# @handler.add(MessageEvent, message=TextMessageContent)
-# def handle_message(event: MessageEvent):
-#     with ApiClient(configuration) as api_client:
-#         line_bot_api = MessagingApi(api_client)
-
-#     user_id = event.source.user_id
-#     print(f"User ID: {user_id}")  # หรือส่งกลับให้ user เห็น
-#     line_bot_api.reply_message(
-#         ReplyMessageRequest(
-#             reply_token=event.reply_token,
-#             messages=[TextMessage(text=f"Your user ID is: {user_id}")]
-#         )
-#     )
 def loading_animation(user_id: str):
     url = "https://api.line.me/v2/bot/chat/loading/start"
     payload = json.dumps({
@@ -66,12 +52,32 @@ def loading_animation(user_id: str):
     requests.request("POST", url, headers=headers, data=payload)
 
 
+@handler.add(MessageEvent, message=TextMessageContent)
+def handle_message(event: MessageEvent):
+    loading_animation(user_id=event.source.user_id)
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+
+    user_message = event.message.text
+
+    if user_message == "วิธีการใช้งาน":
+        reply_message = FlexMessage(
+            alt_text="วิธีใช้งาน",
+            contents=how_to_use()
+        )
+        line_bot_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[reply_message]
+            )
+        )
+
+
 @handler.add(MessageEvent, message=ImageMessageContent)
 def handle_image_message(event: MessageEvent):
     loading_animation(user_id=event.source.user_id)
     message_id = event.message.id
-    url_reply = f'https://e69043f6026f.ngrok-free.app/img/{message_id}.jpg'
-    url_thongdee = f'https://e69043f6026f.ngrok-free.app/thongdee/ThongDee.png'
+    url_reply = f'https://1f87-1-47-80-142.ngrok-free.app/img/{message_id}.jpg'
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         blob_api = MessagingApiBlob(api_client)
@@ -101,9 +107,8 @@ def handle_image_message(event: MessageEvent):
             messages=[reply_message]
             )
         )
-    
     else:
-        flex_not = not_pomelo(url_thongdee)
+        flex_not = not_pomelo()
 
         reply_message = FlexMessage(
             alt_text="ขออภัย",
@@ -115,15 +120,32 @@ def handle_image_message(event: MessageEvent):
                 messages=[reply_message]
             )
         )
-    
-    # else:
-    #     reply_message = TextMessage(text= "รบกวนส่งรูปส้มโอมาอีกครั้งได้ไหมคะ")
-    #     line_bot_api.reply_message(
-    #         ReplyMessageRequest(
-    #         reply_token=event.reply_token, 
-    #         messages=[reply_message]
-    #         )
-    #     )
+
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    loading_animation(user_id=event.source.user_id)
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        data = event.postback.data
+
+        if data == "action=open_camera":
+            reply_message = TextMessage(
+                text="กดปุ่มด้านล่างเพื่อเปิดกล้องเลยค่ะ 📷",
+                quick_reply=QuickReply(
+                    items=[
+                        QuickReplyItem(action=CameraAction(label="📷 เปิดกล้อง")),
+                        QuickReplyItem(action=CameraRollAction(label="🖼️ เลือกจากคลัง"))
+                    ]
+                )
+            )
+            line_bot_api.reply_message(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[reply_message]
+                )
+            )
+            
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0")
