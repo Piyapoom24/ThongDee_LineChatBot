@@ -1,4 +1,4 @@
 env/
 img/
 _pycache_/
-.env/
+.env
