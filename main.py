@@ -14,6 +14,8 @@ import os
 import uvicorn
 import requests
 import json
+import datetime
+
 
 app = FastAPI()
 load_dotenv(override=True)
@@ -37,8 +39,6 @@ async def callback(request: Request, x_line_signature: str = Header(None)):
     return 'OK'
 
 
-#API ชั่วคราวไว้ส่งรูปกลับไปให้ user
-app.mount("/img", StaticFiles(directory="img"), name="img")
 
 def loading_animation(user_id: str):
     url = "https://api.line.me/v2/bot/chat/loading/start"
@@ -77,23 +77,20 @@ def handle_message(event: MessageEvent):
 def handle_image_message(event: MessageEvent):
     loading_animation(user_id=event.source.user_id)
     message_id = event.message.id
-    url_reply = f'https://1f87-1-47-80-142.ngrok-free.app/img/{message_id}.jpg'
+
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         blob_api = MessagingApiBlob(api_client)
 
+    timestamp = datetime.datetime.formatimestamp((event.timestamp) / 1000).strftime("%H:%M:%S")
     content = blob_api.get_message_content(message_id)
-
-    image_path = f"./img/{message_id}.jpg"
-    with open(image_path, "wb") as f:
-        f.write(content)
     
-    Check = FruitClassify(image_path)
+    Check = FruitClassify(image = content, time = timestamp)
     fruit = Check.predict()
 
     if fruit == "Pomelo":
         # predict, conf = Classify(event)
-        flex_pred, predict = show_pred(event, url_reply)
+        flex_pred, predict = show_pred(image = content)
         print(predict)
 
         # reply_message = TextMessage(text="ได้รูปแล้ว")

@@ -1,114 +1,156 @@
 from linebot.v3.messaging.models import FlexContainer
-from predict import Classify
+from Classifier_model import SomOClassifier
 
-def show_pred(event, url):
-    predict, conf = Classify(event)
+def show_pred(image, time):
+    predictor = SomOClassifier(image)
+    conf, label = predictor.predict()
+    confidence = f"{float(conf*100):.2f}"
+
+    is_sweet = label == "Sweet"
+    header_bg  = "#F9FFF5" if is_sweet else "#F8F8F8"
+    result_color = "#2E7D00" if is_sweet else "#666666"
+    bar_color  = "#00B900" if is_sweet else "#AAAAAA"
+    badge_bg   = "#F0FFF0" if is_sweet else "#F5F5F5"
+    badge_border = "#B2DFB2" if is_sweet else "#DDDDDD"
+    badge_text = "✅ ส้มโอหวาน" if is_sweet else "❌ ส้มโอไม่หวาน"
+
     flex_pred = {
       "type": "bubble",
-      "hero": {
-        "type": "image",
-        "url": url,
-        "aspectMode": "cover",
-        "aspectRatio": "20:20",
-        "size": "full"
+      "size": "mega",
+      "header": {
+        "type": "box",
+        "layout": "horizontal",
+        "contents": [
+          {
+            "type": "text",
+            "weight": "bold",
+            "size": "lg",
+            "color": "#1A1A1A",
+            "gravity": "center",
+            "flex": 1,
+            "text": "📊 ผลการทำนาย"
+          },
+          {
+            "type": "text",
+            "text": time,
+            "size": "sm",
+            "color": "#AAAAAA",
+            "align": "end",
+            "gravity": "center",
+            "flex": 0
+          }
+        ],
+        "backgroundColor": header_bg,
+        "paddingAll": "14px"
       },
       "body": {
-      "type": "box",
-      "layout": "vertical",
-      "contents": [
-        {
-          "type": "text",
-          "text": "Prediction Result",
-          "weight": "bold",
-          "size": "xl",
-          "align": "center"
-        },
-        {
-          "type": "separator",
-          "color": "#778899",
-          "margin": "sm"
-        },
-        {
-          "type": "box",
-          "layout": "horizontal",
-          "contents": [
-            {
-              "type": "text",
-              "text": "Prediction: ",
-              "margin": "none",
-              "size": "md"
-            },
-            {
-              "type": "text",
-              "text": f"{predict}",
-              "weight": "bold",
-              "color": "#336600"
-            },
-            {
-              "type": "filler"
-            }
-          ],
-          "spacing": "none",
-          "margin": "md"
-        },
-        {
-          "type": "box",
-          "layout": "horizontal",
-          "contents": [
-            {
-              "type": "text",
-              "text": "Confidence: ",
-              "margin": "none",
-              "size": "md"
-            },
-            {
-              "type": "text",
-              "text": f"{conf}%",
-              "weight": "bold",
-              "color": "#336600",
-              "flex": 2,
-              "offsetStart": "sm"
-            },
-          ],
-          "spacing": "none",
-          "margin": "md"
-        },
-        {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "box",
-              "layout": "vertical",
-              "contents": [
-                {
-                  "type": "filler"
-                }
-              ],
-              "width": f"{conf}%",
-              "backgroundColor": "#336600",
-              "height": "8px",
-              "spacing": "none"
-            }
-          ],
-          "backgroundColor": "#D3D3D3",
-          "height": "8px",
-          "margin": "sm",
-          "spacing": "none"
-        },
-        {
-          "type": "text",
-          "text": f"{conf}%",
-          "weight": "bold",
-          "align": "end",
-          "size": "xs",
-          "margin": "xs"
-        }
-
-      ]
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "PREDICTION RESULT",
+            "size": "xs",
+            "color": "#969494",
+            "align": "center",
+            "weight": "bold"
+          },
+          {
+            "type": "separator",
+            "margin": "sm",
+            "color": "#d6d6d6"
+          },
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Prediction:",
+                "size": "md",
+                "color": "#888888",
+                "gravity": "center"
+              },
+              {
+                "type": "text",
+                "text": label,
+                "size": "md",
+                "color": result_color,
+                "weight": "bold",
+                "align": "end",
+                "gravity": "center"
+              }
+            ],
+            "margin": "md"
+          },
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Confidence:",
+                "size": "md",
+                "color": "#888888",
+                "gravity": "center"
+              },
+              {
+                "type": "text",
+                "text": confidence,
+                "size": "md",
+                "color": result_color,
+                "weight": "bold",
+                "align": "end",
+                "gravity": "center"
+              }
+            ],
+            "margin": "sm"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [],
+                "width": confidence,
+                "height": "8px",
+                "backgroundColor": bar_color,
+                "cornerRadius": "99px"
+              }
+            ],
+            "backgroundColor": "#EEEEEE",
+            "cornerRadius": "99px",
+            "height": "8px",
+            "margin": "md"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": badge_text,
+                "color": bar_color,
+                "weight": "bold",
+                "size": "lg",
+                "align": "center"
+              }
+            ],
+            "backgroundColor": badge_bg ,
+            "cornerRadius": "99px",
+            "paddingAll": "8px",
+            "margin": "lg",
+            "borderWidth": "1px",
+            "borderColor": badge_border
+          }
+        ],
+        "backgroundColor": "#FFFFFF",
+        "paddingAll": "16px"
+      }
     }
-  }
-    return FlexContainer.from_dict(flex_pred), predict
+    return FlexContainer.from_dict(flex_pred), label
 
 def not_pomelo():
     flex = {

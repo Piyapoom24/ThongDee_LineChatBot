@@ -1,5 +1,5 @@
 from PIL import Image
-from cropclass import CropSomOClassifier
+from Classifier_model import SomOClassifier
 from linebot.v3.messaging import TextMessage
 
 def Classify(event):
@@ -7,7 +7,7 @@ def Classify(event):
     path = f'./img/{id}.jpg'
     # image = Image.open(path)
 
-    predictor = CropSomOClassifier(path)
+    predictor = SomOClassifier(path)
     conf, label = predictor.predict()
     confidence = conf*100
 

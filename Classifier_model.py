@@ -10,9 +10,9 @@ import io
 
 
 
-class CropSomOClassifier:
-    def __init__(self, path):
-        self.path = path
+class SomOClassifier:
+    def __init__(self, image):
+        self.image = image
         self.check_point = torch.load('mobile_adam01_model.pth', map_location=torch.device('cpu'))
         self.model = models.mobilenet_v3_large(weights='IMAGENET1K_V2')
         nr_filters = self.model.classifier[0].in_features
@@ -30,7 +30,7 @@ class CropSomOClassifier:
         ])
 
     def predict(self, base = 3456, target_size = 1800):
-        img = Image.open(self.path)
+        img = Image.open(self.image)
         # img = img.resize((base, base))
         # print('original',img.size)
 
