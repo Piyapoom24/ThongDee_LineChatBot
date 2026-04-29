@@ -1,8 +1,8 @@
 ﻿# การใช้งาน ✏️
 ## Create file .env
 ```
-LINE_TOKEN=your_token_here
-LINE_SECRET=your_secret_here
+ACCESS_TOKEN=your_token_here
+CHANNEL_SECRET=your_secret_here
 ```
 
 ## Ngrok
