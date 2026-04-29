@@ -7,7 +7,7 @@ LINE_SECRET=your_secret_here
 
 ## Ngrok
 ```bash
-ngroh http 8999
+ngrok http 8999
 ```
 จากนั้นนำ https เปลี่ยนที่ Webhook URL > [Line Messaging API](https://developers.line.biz/console/channel/2006800711/messaging-api)  
 <br>
